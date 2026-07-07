@@ -69,6 +69,8 @@
       register: public_dir
       delegate_to: localhost
       become: false
+      vars:
+        ansible_connection: local
 
     - name: Copy public/ static assets if present
       ansible.builtin.copy:

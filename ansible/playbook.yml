@@ -63,12 +63,9 @@
         mode: "0644"
         directory_mode: "0755"
 
-    - name: Check if public/ directory exists
-      local_action:
-        module: ansible.builtin.stat
-        path: "{{ playbook_dir }}/../public"
-      register: public_dir
-      become: false
+    - name: Check if public/ directory exists (controller-local)
+      ansible.builtin.set_fact:
+        public_dir_exists: "{{ lookup('ansible.builtin.fileglob', playbook_dir + '/../public/*') | length > 0 }}"
 
     - name: Copy public/ static assets if present
       ansible.builtin.copy:
@@ -78,7 +75,7 @@
         group: "{{ app_user }}"
         mode: "0644"
         directory_mode: "0755"
-      when: public_dir.stat.exists
+      when: public_dir_exists | bool
 
     - name: Copy requirements.txt
       ansible.builtin.copy:
